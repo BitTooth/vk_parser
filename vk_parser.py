@@ -1,9 +1,7 @@
 import requests
 import json
-
-class message:
-	
-token = 'a85171a1089d907694f3b599722531bb0066f95ef509b5fca4697d8d5cf744985ed2cb6aff4fe5dcb6847'
+from user_token import token
+              	
 my_uid = '27942449'
 dialog_uid = '60944302'
 
@@ -17,6 +15,7 @@ print 'Hello parser!'
 
 data = json.loads(r.text)
 
+print data
 print data['response'][1]['uid']
 
 #for i in range(1, data['response'][0] - 1):
