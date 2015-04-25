@@ -37,8 +37,15 @@ def PrintCloud(output, words):
 			output.write(word[0].encode("UTF-8") + '(' + str(word[1]) + ') ')
 	output.write('\n\n\n\n')
 
+def FilterMessagesByUser(messages, uid):
+	uid_messages = []
+	for message in messages:
+		if int(message.author) == int(uid):
+			uid_messages.append(message)
+	return uid_messages
+
 my_uid = '27942449'
-dialog_uid = '283016300'
+dialog_uid = '60944302'
 
 url = 'https://api.vk.com/method/messages.getDialogs?'
 payload = {'offset': '0', 'count': '200', 'access_token': token}
@@ -100,4 +107,19 @@ output.write('first message at ' + str(date.fromtimestamp(messages[-1].time)) + 
 # generate general words cloud
 cloud = GenerateWordsCloud(messages)
 output.write('General words map\n')
+PrintCloud(output, cloud)
+
+#============================================================================================================
+# generate clouds by user
+
+# my cloud
+my_messages = FilterMessagesByUser(messages, my_uid)
+cloud = GenerateWordsCloud(my_messages)
+output.write('My wods map\n')
+PrintCloud(output, cloud)
+
+# partner cloud
+partner_messages = FilterMessagesByUser(messages, dialog_uid)
+cloud = GenerateWordsCloud(partner_messages)
+output.write('Partner words map\n')
 PrintCloud(output, cloud)
