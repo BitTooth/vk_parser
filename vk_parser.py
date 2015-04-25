@@ -1,13 +1,23 @@
 import requests
 import json
+import operator
+from datetime import date
+from datetime import time
 from user_token import token
-              	
-my_uid = '27942449'
-dialog_uid = '60944302'
 
+class Message:
+	def __init__(self, author, time, text):
+		self.author = author
+		self.time = time
+		self.text = text
+
+my_uid = '27942449'
+dialog_uid = '283016300'
 
 url = 'https://api.vk.com/method/messages.getDialogs?'
 payload = {'offset': '0', 'count': '200', 'access_token': token}
+
+delimeters = ".,\\/><[]{}()!@#$%^&*:;\"\'?1234567890\n"
 
 r = requests.get(url, params=payload)
 
@@ -15,7 +25,6 @@ print 'Hello parser!'
 
 data = json.loads(r.text)
 
-print data
 print data['response'][1]['uid']
 
 #for i in range(1, data['response'][0] - 1):
@@ -41,7 +50,45 @@ while currentCount < messagesCount:
 	data = json.loads(r.text)
 
 	for i in range(1, len(data['response']) - 1):
-		messages.append(data['response'][i]['body'])
+		messages.append(Message(
+			data['response'][i]['from_id'],	
+			data['response'][i]['date'],
+			data['response'][i]['body']
+			))
 
 	currentCount = currentCount + len(data['response']) - 1
 	print currentCount
+
+# write messages to file for test
+output = open('out.txt', 'w')
+for message in messages:
+	output.write(message.text.encode("UTF-8") + str('\n')) 
+
+#============================================================================================================
+# and now get some general statistics
+output = open('stats.txt', 'w')
+output.write('number of messages: ' + str(len(messages)) + '\n')
+output.write('first message at ' + str(date.fromtimestamp(messages[-1].time)) + '\n\n')
+
+#============================================================================================================
+# clear messages from delimeters
+for d in delimeters:
+	for message in messages:
+		message.text = message.text.replace(d, ' ').lower()
+
+#============================================================================================================
+# generate most used words dictionary
+word_map = {}
+for message in messages:
+	for word in message.text.split( ):
+		if word in word_map.keys():
+			word_map[word] = word_map[word] + 1
+		else:
+			word_map[word] = 1
+
+sorted_map = reversed(sorted(word_map.items(), key=operator.itemgetter(1)))
+
+output.write('Words map\n')
+for word in sorted_map:
+	if len(word[0]) > 2 and word[1] > 2:
+		output.write(word[0].encode("UTF-8") + '(' + str(word[1]) + ') ')
