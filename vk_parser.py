@@ -50,6 +50,8 @@ def AverageLengthOfMessages(messages):
 		summ = summ + len(message.text)
 	return summ / len(messages)
 
+#============================================================================================================
+# confing part
 my_uid = '27942449'
 dialog_uid = '60944302'
 
@@ -58,16 +60,16 @@ payload = {'offset': '0', 'count': '200', 'access_token': token}
 
 delimeters = ".,\\/><[]{}()!@#$%^&*:;\"\'?1234567890\n"
 
+#============================================================================================================
+# test request
+
 r = requests.get(url, params=payload)
+if r.status_code <> 200:
+	print 'Something wrong with request\n'
+	print 'status_code: ' + str(r.status_code)
 
-print 'Hello parser!'
-
-data = json.loads(r.text)
-
-print data['response'][1]['uid']
-
-#for i in range(1, data['response'][0] - 1):
-#	print data['response'][i]['body']
+#============================================================================================================
+# gather statistics
 
 # get number of messages in dialog. Ugly, but good for now
 url = 'https://api.vk.com/method/messages.getHistory?'
