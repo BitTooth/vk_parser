@@ -11,6 +11,32 @@ class Message:
 		self.time = time
 		self.text = text
 
+def GenerateWordsCloud(messages):
+	# clear messages from delimeters
+	for d in delimeters:
+		for message in messages:
+			message.text = message.text.replace(d, ' ').lower()
+
+	# generate most used words dictionary
+	word_map = {}
+	for message in messages:
+		for word in message.text.split( ):
+			if word in word_map.keys():
+				word_map[word] = word_map[word] + 1
+			else:
+				word_map[word] = 1
+
+	# and sort it
+	sorted_map = reversed(sorted(word_map.items(), key=operator.itemgetter(1)))
+
+	return sorted_map
+
+def PrintCloud(output, words):
+	for word in cloud:
+		if len(word[0]) > 2 and word[1] > 2:
+			output.write(word[0].encode("UTF-8") + '(' + str(word[1]) + ') ')
+	output.write('\n\n\n\n')
+
 my_uid = '27942449'
 dialog_uid = '283016300'
 
@@ -71,24 +97,7 @@ output.write('number of messages: ' + str(len(messages)) + '\n')
 output.write('first message at ' + str(date.fromtimestamp(messages[-1].time)) + '\n\n')
 
 #============================================================================================================
-# clear messages from delimeters
-for d in delimeters:
-	for message in messages:
-		message.text = message.text.replace(d, ' ').lower()
-
-#============================================================================================================
-# generate most used words dictionary
-word_map = {}
-for message in messages:
-	for word in message.text.split( ):
-		if word in word_map.keys():
-			word_map[word] = word_map[word] + 1
-		else:
-			word_map[word] = 1
-
-sorted_map = reversed(sorted(word_map.items(), key=operator.itemgetter(1)))
-
-output.write('Words map\n')
-for word in sorted_map:
-	if len(word[0]) > 2 and word[1] > 2:
-		output.write(word[0].encode("UTF-8") + '(' + str(word[1]) + ') ')
+# generate general words cloud
+cloud = GenerateWordsCloud(messages)
+output.write('General words map\n')
+PrintCloud(output, cloud)
