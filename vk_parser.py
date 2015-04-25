@@ -1,6 +1,7 @@
 import requests
 import json
 import operator
+import datetime
 from datetime import date
 from datetime import time
 from user_token import token
@@ -145,3 +146,18 @@ PrintCloud(output, cloud)
 cloud = GenerateWordsCloud(partner_messages)
 output.write('Partner words map\n')
 PrintCloud(output, cloud)
+
+#============================================================================================================
+# generate timeline of messages
+timeline = {}
+for i in range(0, 24):
+	timeline[i] = 0
+
+for message in messages:
+	hour = datetime.datetime.fromtimestamp(message.time).hour
+	timeline[hour] = timeline[hour] + 1
+
+output.write("Timeline of messages\n")
+for i in range(0, 24):
+	output.write(str(i) + ': ' + str(timeline[i]) + '\n')
+
