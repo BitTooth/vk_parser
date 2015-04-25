@@ -44,6 +44,12 @@ def FilterMessagesByUser(messages, uid):
 			uid_messages.append(message)
 	return uid_messages
 
+def AverageLengthOfMessages(messages):
+	summ = 0
+	for message in messages:
+		summ = summ + len(message.text)
+	return summ / len(messages)
+
 my_uid = '27942449'
 dialog_uid = '60944302'
 
@@ -103,6 +109,22 @@ output = open('stats.txt', 'w')
 output.write('number of messages: ' + str(len(messages)) + '\n')
 output.write('first message at ' + str(date.fromtimestamp(messages[-1].time)) + '\n\n')
 
+
+my_messages = FilterMessagesByUser(messages, my_uid)
+partner_messages = FilterMessagesByUser(messages, dialog_uid)
+
+output.write('Number of my messages: ' + str(len(my_messages)) + '(' + str(len(my_messages) * 100 / len(messages)) + '%)\n')
+output.write('Number of partner messages: ' + str(len(partner_messages)) + '(' + str(len(partner_messages) * 100 / len(messages)) + '%)\n')
+
+output.write('\n')
+
+# average length of message
+output.write('My average length of messages: ' + str(AverageLengthOfMessages(my_messages)) + '\n')
+output.write('Partner average length of messages: ' + str(AverageLengthOfMessages(partner_messages)) + '\n')
+
+
+output.write('\n\n')
+
 #============================================================================================================
 # generate general words cloud
 cloud = GenerateWordsCloud(messages)
@@ -113,13 +135,11 @@ PrintCloud(output, cloud)
 # generate clouds by user
 
 # my cloud
-my_messages = FilterMessagesByUser(messages, my_uid)
 cloud = GenerateWordsCloud(my_messages)
 output.write('My wods map\n')
 PrintCloud(output, cloud)
 
 # partner cloud
-partner_messages = FilterMessagesByUser(messages, dialog_uid)
 cloud = GenerateWordsCloud(partner_messages)
 output.write('Partner words map\n')
 PrintCloud(output, cloud)
