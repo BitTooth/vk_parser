@@ -13,6 +13,9 @@ payload = {'offset': '0', 'count': '5', 'access_token': token}
 
 delimeters = ".,\\/><[]{}()!@#$%^&*:;\"\'?1234567890\n"
 
+my_name = 'Me'
+partner_name = 'Partner'
+
 class Message:
 	def __init__(self, author, time, text):
 		self.author = author
@@ -20,11 +23,10 @@ class Message:
 		self.text = text
 
 	def getAuthor(self, uid):
-		# TODO: add getting real name via request
 		if int(uid) == int(my_uid):
-			return "Aliaksey Korzun"
+			return my_name
 		else:
-			return "Yuliya Galkina"
+			return partner_name
 
 def GenerateWordsCloud(messages):
 	# clear messages from delimeters
@@ -72,6 +74,18 @@ r = requests.get(url, params=payload)
 if r.status_code <> 200:
 	print 'Something wrong with request\n'
 	print 'status_code: ' + str(r.status_code)
+
+#============================================================================================================
+# resolve names
+
+url = 'https://api.vk.com/method/users.get?'
+payload = {'user_ids': my_uid + ',' + partner_uid, 'name_case':'nom'}
+r = requests.get(url, params=payload)
+if r.status_code == 200:
+	# set names
+	data = json.loads(r.text)
+	my_name = (data['response'][0]['first_name'] + ' ' + data['response'][0]['last_name']).encode("UTF-8")
+	partner_name = (data['response'][1]['first_name'] + ' ' + data['response'][1]['last_name']).encode("UTF-8")
 
 #============================================================================================================
 # gather statistics
