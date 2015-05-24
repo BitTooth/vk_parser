@@ -1,9 +1,10 @@
 import requests
 import json
-from user_token import token
+from config import token
+from config import my_uid
 
 url = 'https://api.vk.com/method/audio.get?'
-payload = {'owner_id':'27942449', 'offset':'0', 'count':'6000', 'access_token':token}
+payload = {'owner_id':my_uid, 'offset':'0', 'count':'6000', 'access_token':token}
 r = requests.get(url, params=payload)
 
 if r.status_code <> 200:

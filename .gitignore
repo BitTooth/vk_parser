@@ -1,5 +1,4 @@
-user_token.py
-user_token.pyc
+*.pyc
 out.txt
 stats.txt
 music_list.txt

@@ -4,13 +4,27 @@ import operator
 import datetime
 from datetime import date
 from datetime import time
-from user_token import token
+from config import token
+from config import my_uid
+from config import partner_uid
+
+url = 'https://api.vk.com/method/messages.getDialogs?'
+payload = {'offset': '0', 'count': '5', 'access_token': token}
+
+delimeters = ".,\\/><[]{}()!@#$%^&*:;\"\'?1234567890\n"
 
 class Message:
 	def __init__(self, author, time, text):
 		self.author = author
 		self.time = time
 		self.text = text
+
+	def getAuthor(self, uid):
+		# TODO: add getting real name via request
+		if int(uid) == int(my_uid):
+			return "Aliaksey Korzun"
+		else:
+			return "Yuliya Galkina"
 
 def GenerateWordsCloud(messages):
 	# clear messages from delimeters
@@ -52,16 +66,6 @@ def AverageLengthOfMessages(messages):
 	return summ / len(messages)
 
 #============================================================================================================
-# confing part
-my_uid = '27942449'
-dialog_uid = '60944302'
-
-url = 'https://api.vk.com/method/messages.getDialogs?'
-payload = {'offset': '0', 'count': '200', 'access_token': token}
-
-delimeters = ".,\\/><[]{}()!@#$%^&*:;\"\'?1234567890\n"
-
-#============================================================================================================
 # test request
 
 r = requests.get(url, params=payload)
@@ -74,7 +78,7 @@ if r.status_code <> 200:
 
 # get number of messages in dialog. Ugly, but good for now
 url = 'https://api.vk.com/method/messages.getHistory?'
-payload = {'offset': '0', 'user_id': dialog_uid, 'access_token': token}
+payload = {'offset': '0', 'user_id': partner_uid, 'access_token': token}
 r = requests.get(url, params=payload)
 data = json.loads(r.text)
 messagesCount = data['response'][0]
@@ -87,7 +91,7 @@ messages = []
 
 while currentCount < messagesCount:
 	url = 'https://api.vk.com/method/messages.getHistory?'
-	payload = {'offset': currentCount, 'count':'200', 'user_id': dialog_uid, 'access_token': token}
+	payload = {'offset': currentCount, 'count':'200', 'user_id': partner_uid, 'access_token': token}
 	r = requests.get(url, params=payload)
 	data = json.loads(r.text)
 
@@ -104,7 +108,14 @@ while currentCount < messagesCount:
 # write messages to file for test
 output = open('out.txt', 'w')
 for message in messages:
-	output.write(message.text.encode("UTF-8") + str('\n')) 
+	output.write(
+		message.getAuthor(message.author)
+		+ str('\n[')
+		+ str(datetime.datetime.fromtimestamp(message.time))
+		+ str(']\n') 
+		+ message.text.encode("UTF-8") 
+		+ '\n\n============================================================\n\n'
+	) 
 
 #============================================================================================================
 # and now get some general statistics
@@ -114,7 +125,7 @@ output.write('first message at ' + str(date.fromtimestamp(messages[-1].time)) + 
 
 
 my_messages = FilterMessagesByUser(messages, my_uid)
-partner_messages = FilterMessagesByUser(messages, dialog_uid)
+partner_messages = FilterMessagesByUser(messages, partner_uid)
 
 output.write('Number of my messages: ' + str(len(my_messages)) + '(' + str(len(my_messages) * 100 / len(messages)) + '%)\n')
 output.write('Number of partner messages: ' + str(len(partner_messages)) + '(' + str(len(partner_messages) * 100 / len(messages)) + '%)\n')
