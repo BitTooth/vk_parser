@@ -1,0 +1,1 @@
+/data/user/0/com.hipipal.qpyplus/files/bin/init.sh && /data/user/0/com.hipipal.qpyplus/files/bin/qpython-android5.sh "/storage/emulated/0/com.hipipal.qpyplus/scripts/get_music.py" && exit
